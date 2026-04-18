@@ -3,7 +3,7 @@
 #include <string>
 #include <cstdint>
 #include <map>
-#include "motherboard/MemoryModule.h"
+#include "../q3.h"
 
 struct CompilationResult {
     std::vector<uint16_t> codeSegment;
