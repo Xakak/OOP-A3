@@ -73,7 +73,6 @@ void MemoryModule::loadRawBinary(unsigned short addr, unsigned short word) {
 
 // register bank stuff
 RegisterBank::RegisterBank() {
-    // using this-> on some because it looks more official?
     for (int i = 0; i < 8; i++) {
         regs[i] = 0;
     }
@@ -102,7 +101,6 @@ unsigned short RegisterBank::readReg(int id) {
     return 0;
 }
 
-// FIX 3: RegisterBank::writeReg — change to else-if chain
 void RegisterBank::writeReg(int id, unsigned short val) {
     if (id >= 0 && id <= 7) {
         regs[id] = val;
@@ -271,7 +269,6 @@ void Display::printChar(char c) {
     }
 }
 
-// FIX 12: Add phosphor green border to Display::render()
 void Display::render() {
     // print top border in green
     cout << "\033[32m";
@@ -291,7 +288,6 @@ void Display::render() {
     cout << "\033[0m";
 }
 
-// FIX 5, 8: Fix power draw values in Mainboard constructor
 Mainboard::Mainboard() {
     ram = nullptr;
     kb = nullptr;
@@ -307,7 +303,6 @@ Mainboard::Mainboard() {
     powered = true;
 }
 
-// FIX 11: Wire GraphicsAdapter into Mainboard (now reverted)
 void Mainboard::connect(MemoryModule* m, Keyboard* k, Display* d, Processor* p) {
     this->ram = m;
     this->kb = k;
@@ -328,7 +323,6 @@ unsigned char Mainboard::handleMMIORead(unsigned short addr) {
         return kb->pop();
     }
     
-    // FIX 9: Implement MMIO 0x0FF3 integer keyboard port
     if (addr == 0x0FF3) {
         if (kb->isEmpty() != false) {
             cout << endl << "[Hardware Interrupt] Awaiting Keyboard Input: ";
@@ -350,21 +344,18 @@ unsigned char Mainboard::handleMMIORead(unsigned short addr) {
     }
     return 0;
 }
-
-// FIX 11: handleMMIOWrite calls gpu methods
 void Mainboard::handleMMIOWrite(unsigned short addr, unsigned char val) {
     if (addr == 0x0FF1) {
         gpu->printChar((char)val);
     }
     
-    // FIX 8, 11: MMIO display ports
     if (addr == 0x0FF2) {
         // convert byte to decimal string and send each digit
         unsigned char num = val;
         if (num == 0) {
             gpu->printChar('0');
         } else {
-            // find digits without cmath or string
+            // find digits 
             unsigned char digits[3];
             int dcount = 0;
             unsigned char tmp = num;
@@ -382,7 +373,7 @@ void Mainboard::handleMMIOWrite(unsigned short addr, unsigned char val) {
 }
 
 unsigned char Mainboard::readBus(unsigned short addr) {
-    // FIX 7: Add fault zone check to Mainboard
+    
     if (addr >= 0x0F00 && addr <= 0x0FEF) {
         cout << "[MOTHERBOARD FAULT] Invalid Read Address" << endl;
         return 0x00;
@@ -398,7 +389,7 @@ unsigned char Mainboard::readBus(unsigned short addr) {
 }
 
 void Mainboard::writeBus(unsigned short addr, unsigned char val) {
-    // FIX 7: Add fault zone check to Mainboard
+  
     if (addr >= 0x0F00 && addr <= 0x0FEF) {
         cout << "[MOTHERBOARD FAULT] Invalid Write Address" << endl;
         return;
@@ -413,7 +404,6 @@ void Mainboard::writeBus(unsigned short addr, unsigned char val) {
     }
 }
 
-// FIX 8: update pulseClock to track active power and check PSU
 void Mainboard::pulseClock() {
     if (powered == false) {
         return;
@@ -432,7 +422,6 @@ void Mainboard::pulseClock() {
     }
 }
 
-// FIX 1: Processor temperature initialization
 Processor::Processor() {
     regs = nullptr;
     alu = nullptr;
@@ -442,7 +431,6 @@ Processor::Processor() {
     debugMode = false;
     decodeTable = new Instruction[256];
     
-    // FIX 10: Cache initialization
     cacheBase = 0;
     cacheValid = 0;
     for (int i = 0; i < 16; i++) { cacheBlock[i] = 0; }
@@ -480,7 +468,6 @@ void Processor::initDecodeTable() {
         decodeTable[i].isValid = false;
         decodeTable[i].usesALU = false;
         decodeTable[i].aluOp = 0;
-        // FIX 4: Initialize new fields
         decodeTable[i].writesReg = false;
         decodeTable[i].isMemRead = false;
         decodeTable[i].isMemWrite = false;
@@ -491,7 +478,6 @@ void Processor::initDecodeTable() {
         decodeTable[i].is16BitImm = false;
     }
     
-    // FIX 5: Complete initDecodeTable
     decodeTable[0x00].isValid = true; // NOP
     
     decodeTable[0x01].isValid = true; // ADD
@@ -546,7 +532,6 @@ void Processor::initDecodeTable() {
     decodeTable[0x21].isMemWrite = true;
 }
 
-// FIX 2: Thermal shutdown must set halt flag
 void Processor::checkHeat() {
     float rise = 0.05;
     temp = temp + rise;
@@ -559,7 +544,6 @@ void Processor::checkHeat() {
     }
 }
 
-// FIX 10: cachedRead implementation
 unsigned char Processor::cachedRead(unsigned short addr) {
     if (cacheValid == 1) {
         if (addr >= cacheBase) {
@@ -590,7 +574,6 @@ unsigned short Processor::fetchWord() {
     return fetched;
 }
 
-// FIX 3: decodeStage immediate fetch should use cachedRead
 void Processor::decodeStage() {
     unsigned short irVal = regs->readReg(9);
     curOp = (unsigned char)(irVal >> 8);
@@ -683,8 +666,6 @@ void Processor::executeStage() {
     
     checkHeat();
 }
-
-// FIX 1, 2, 4, 6: step() calls sequence and debug trace
 void Processor::step() {
     if (halted != false) {
         return;

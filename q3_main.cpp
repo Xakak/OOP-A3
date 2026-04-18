@@ -12,8 +12,8 @@ int main() {
     cout << "=== BOOTING SILICON PROTOCOL ===" << endl << endl;
 
     // Boot Menu
-    cout << "[1] Turing Complete Human Undo Calculator" << endl;
-    cout << "[2] \"HELLO WORLD\" Undo Printer" << endl;
+    cout << "[1] Turing Complete Human Urdu Calculator" << endl;
+    cout << "[2] \"HELLO WORLD\" Urdu Printer" << endl;
     cout << "[3] Hardware Authentication Firewall" << endl;
     
     int selection;
