@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include "q1.h"
+
 
 using namespace std;
 
@@ -130,7 +132,7 @@ World::~World() {
 }
 
 void World::syncGrid() {
-    // tried doing this in a single pass but it kept overwriting my other organisms pointers so I am just clearing the entire board first and then retamp them. It is slower but works.
+    // tried doing this in a single pass but it kept overwriting my other organisms pointers so I am just clearing the entire board first and and filling again
     for (int row = 0; row < gridHeight; row++) { 
         for (int col = 0; col < gridWidth; col++) {
             grid[row][col].occupant = nullptr;
@@ -360,4 +362,37 @@ void KineticHunter::update(Tile** world, int worldWidth, int worldHeight) {
             }
         }
     }
+}
+
+
+int main() {
+    int width = 25;
+    int height = 15;
+    int maxPop = 30;
+    
+    World* myWorld = new World(width, height, maxPop);
+
+    // Initial dummy organisms for Q1
+    // Using simple coordinates
+    myWorld->addOrganism(new FractalSprawler(2, 2, 2, 2));
+    myWorld->addOrganism(new FractalSprawler(10, 5, 2, 2));
+    myWorld->addOrganism(new KineticHunter(18, 10, 3, 3));
+
+    int totalIterations = 50;
+    cout << "Press Enter to start simulation and to advance each turn..." << endl;
+    cin.get();
+
+    for (int i = 0; i < totalIterations; i++) {
+        cout << "--- Iteration " << i + 1 << " ---" << endl;
+        
+        myWorld->runIteration();
+        myWorld->draw();
+        
+        cout << "Press Enter for next turn.";
+        cin.get(); 
+    }
+
+    delete myWorld;
+
+    return 0;
 }
