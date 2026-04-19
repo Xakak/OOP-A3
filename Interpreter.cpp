@@ -285,10 +285,18 @@ void Interpreter::loadProgramAndFlash(const std::string& filename, MemoryModule&
     std::cout << "[BIOS] Compiled OS script into " << compiledOS.codeSegment.size() << " native 16-bit instruction words." << std::endl;
 
     std::cout << "[BOOTLOADER] Flashing Code Execution block to RAM Address 0x0000..." << std::endl;
-    ram.loadRawBinary(0x0000, compiledOS.codeSegment);
-    
+    uint16_t codeAddress = 0x0000;
+    for (uint16_t word : compiledOS.codeSegment) {
+        ram.loadRawBinary(codeAddress, word);
+        codeAddress += 2;
+    }
+
     std::cout << "[BOOTLOADER] Flashing Data Variables (.MAWAAD) to RAM Address 0x0800..." << std::endl;
-    ram.loadRawBinary(0x0800, compiledOS.dataSegment);
+    uint16_t dataAddress = 0x0800;
+    for (uint16_t word : compiledOS.dataSegment) {
+        ram.loadRawBinary(dataAddress, word);
+        dataAddress += 2;
+    }
     
     std::cout << "[BOOTLOADER] Flash Complete." << std::endl;
     std::cout << "------------------------------------------------------------\n" << std::endl;
