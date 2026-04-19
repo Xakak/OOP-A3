@@ -4,12 +4,10 @@
 using namespace std;
 
 int main() {
-    // Sophomore level setup
     int width = 25;
     int height = 15;
     int maxPop = 30;
     
-    // Rule 2: Manual allocation
     World* myWorld = new World(width, height, maxPop);
 
     // Initial dummy organisms for Q1
@@ -28,11 +26,10 @@ int main() {
         myWorld->runIteration();
         myWorld->draw();
         
-        cout << "Press Enter for next turn...";
-        cin.get(); // Turn-based progression requirement
+        cout << "Press Enter for next turn.";
+        cin.get(); 
     }
 
-    // Cleaning up all memory
     delete myWorld;
 
     return 0;

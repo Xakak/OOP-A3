@@ -9,7 +9,6 @@ MemoryModule::MemoryModule() {
     this->dataSeg = new unsigned char[1792];
 
     // initialize all memory to 0
-    // not sure if i should use a single loop but two is safer?
     for (int i = 0; i < 2048; i++) {
         codeSeg[i] = 0;
     }
@@ -592,8 +591,6 @@ void Processor::decodeStage() {
 }
 
 void Processor::executeStage() {
-    // this got complicated fast, hopefully the signal flags
-    // handle everything correctly
     
     if (decodeTable[curOp].isValid == false) {
         cout << "[PROCESSOR FAULT] Invalid Instruction 0x" << hex << (int)curOp << dec << endl;
@@ -622,12 +619,12 @@ void Processor::executeStage() {
     
     if (decodeTable[curOp].isMemWrite != false) {
         bus->writeBus(bVal, (unsigned char)aVal);
-        // cache invalidation
+        
         if (cacheValid == 1) {
             if (bVal >= cacheBase) {
-                if (bVal < cacheBase + 16) {
+               if (bVal < cacheBase + 16) {
                     cacheValid = 0;
-                }
+            }
             }
         }
     }
@@ -644,7 +641,7 @@ void Processor::executeStage() {
         }
         if (decodeTable[curOp].branchOnZero == false && decodeTable[curOp].branchOnNotZero == false) {
             doJump = true;
-        }
+    }
         if (doJump != false) {
             regs->writeReg(8, regs->readReg(curSrc));
         }
@@ -696,6 +693,5 @@ void Processor::step() {
         cout << " DEST=R" << dec << (int)dbgDest;
         cout << " SRC=R" << (int)dbgSrc << endl;
     }
-
     executeStage();
 }

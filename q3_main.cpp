@@ -30,7 +30,6 @@ int main() {
     // consume leftover newline
     cin.ignore();
 
-    // Rule 2: all dynamic memory via new
     MemoryModule* ram = new MemoryModule();
     RegisterBank* regs = new RegisterBank();
     ALU* alu = new ALU();
@@ -64,13 +63,11 @@ int main() {
         interp.loadProgramAndFlash("hello.txt", *ram);
     }
 
-    // Execution Loop - Rule 7.11
     int cycleCount = 0;
     while (cpu->isHalted() == false) {
         mb->pulseClock();
         cycleCount = cycleCount + 1;
         
-        // explicit modulo print for MOSS divergence
         if (verbose == 'Y' || verbose == 'y') {
             if (cycleCount % 100 == 0) {
                 cout << "cycles processed: " << cycleCount << endl;
@@ -104,7 +101,6 @@ int main() {
     cout << endl;
     gpu->render();
 
-    // Rule 2: Manual cleanup of all new pointers
     if (ram != nullptr) delete ram;
     if (regs != nullptr) delete regs;
     if (alu != nullptr) delete alu;
